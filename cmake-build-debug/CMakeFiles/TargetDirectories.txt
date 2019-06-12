@@ -1,0 +1,6 @@
+/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/cmake-build-debug/CMakeFiles/test_build_table.dir
+/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/cmake-build-debug/CMakeFiles/read_table.dir
+/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/cmake-build-debug/CMakeFiles/db_bench.dir
+/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/cmake-build-debug/CMakeFiles/test_read_small_largerest.dir
