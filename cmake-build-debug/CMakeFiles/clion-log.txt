@@ -1,4 +1,0 @@
-/home/rrzhang/.local/cmake-3.14.0/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/rrzhang/.local/make-4.2.1/bin/make -DCMAKE_C_COMPILER=/home/rrzhang/.local/gcc-7.3.0/bin/gcc -DCMAKE_CXX_COMPILER=/home/rrzhang/.local/gcc-7.3.0/bin/g++ -G "CodeBlocks - Unix Makefiles" /home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb
--- Configuring done
--- Generating done
--- Build files have been written to: /home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/cmake-build-debug
