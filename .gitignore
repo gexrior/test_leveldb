@@ -1,0 +1,18 @@
+# Editors.
+*.sw*
+.vscode
+.DS_Store
+
+# Build directory.
+build/
+out/
+
+CMakeFiles/
+cmake-build-debug/
+cmake_install.cmake
+CTestTestfile.cmake
+leveldb.cbp
+leveldbConfigVersion.cmake
+Makefile
+CMakeCache.txt
+sst/
