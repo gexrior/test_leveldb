@@ -259,6 +259,26 @@ namespace leveldb {
         return s;
     }
 
+    bool Table::KeyInTable(const ReadOptions &options, const Slice &user_value) {
+        Iterator *iiter = rep_->index_block->NewIterator(rep_->options.comparator);
+        iiter->SeekToFirst();
+        bool flag = false;
+        while(iiter->Valid()){
+            Slice handle_value = iiter->value();
+            FilterBlockReader *filter = rep_->filter;
+            BlockHandle handle;
+            if (filter != nullptr &&
+                handle.DecodeFrom(&handle_value).ok() &&
+                !filter->KeyMayMatch(handle.offset(), user_value)) {
+            } else {
+                flag ==  true;
+                return flag;
+            }
+            iiter->Next();
+        }
+        return flag;
+    }
+
 
     uint64_t Table::ApproximateOffsetOf(const Slice &key) const {
         Iterator *index_iter =
