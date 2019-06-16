@@ -23,6 +23,7 @@ namespace leveldb {
 
     class WriteBatch;
     class Version;
+    class VersionSet;
 
 // Abstract handle to particular state of a DB.
 // A Snapshot is an immutable object and can therefore be safely
@@ -47,6 +48,7 @@ namespace leveldb {
 // any external synchronization.
     class LEVELDB_EXPORT DB {
     public:
+//        virtual VersionSet* GetVersions();
         virtual Version* GetCurrentVersion();
 
         // Open the database with the specified "name".

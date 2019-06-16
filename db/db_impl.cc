@@ -38,12 +38,21 @@
 
 namespace leveldb {
 
-    Version* DBImpl::GetCurrentVersion(){
+    Version *DBImpl::GetCurrentVersion() {
         return versions_->current();
     }
-    Version* DB::GetCurrentVersion(){
+
+    Version *DB::GetCurrentVersion() {
         return GetCurrentVersion();
     }
+
+//    VersionSet *DBImpl::GetVersions() {
+//        return versions_;
+//    }
+//
+//    VersionSet *DB::GetVersions() {
+//        return GetVersions();
+//    }
 
 
     const int kNumNonTableCacheFiles = 10;
@@ -131,7 +140,9 @@ namespace leveldb {
         return sanitized_options.max_open_files - kNumNonTableCacheFiles;
     }
 
-    DBImpl::DBImpl(const Options &raw_options, const std::string &dbname)
+    DBImpl::DBImpl(
+            const Options &raw_options,
+            const std::string &dbname)
             : env_(raw_options.env),
               internal_comparator_(raw_options.comparator),
               internal_filter_policy_(raw_options.filter_policy),
@@ -1153,6 +1164,7 @@ namespace leveldb {
     Status DBImpl::Get(const ReadOptions &options,
                        const Slice &key,
                        std::string *value) {
+//        std::cout << "DBImpl::Get. key=" << key.ToString() << std::endl;
         Status s;
         MutexLock l(&mutex_);
         SequenceNumber snapshot;    // uint_64
@@ -1400,8 +1412,8 @@ namespace leveldb {
                 s = bg_error_;
                 break;
             } else if (
-                    // 第 0 层的 SSTable 文件数量大于等于 kL0_SlowdownWritesTrigger(8)
-                    // 数据库主线程短暂睡眠，等待 0 层文件合并
+                // 第 0 层的 SSTable 文件数量大于等于 kL0_SlowdownWritesTrigger(8)
+                // 数据库主线程短暂睡眠，等待 0 层文件合并
                     allow_delay &&
                     versions_->NumLevelFiles(0) >= config::kL0_SlowdownWritesTrigger) {
                 // We are getting close to hitting a hard limit on the number of
@@ -1417,15 +1429,15 @@ namespace leveldb {
                 mutex_.Lock();
 
             }
-            // write_buffer_size = 4MB
-            // mem 仍有空间
+                // write_buffer_size = 4MB
+                // mem 仍有空间
             else if (!force &&
-                       (mem_->ApproximateMemoryUsage() <= options_.write_buffer_size)) {
+                     (mem_->ApproximateMemoryUsage() <= options_.write_buffer_size)) {
                 // There is room in current memtable
                 break;
             }
-            // mem 没有空间，且 imm 也已写满
-            // 线程在此阻塞
+                // mem 没有空间，且 imm 也已写满
+                // 线程在此阻塞
             else if (imm_ != nullptr) {
                 // We have filled up the current memtable, but the previous
                 // one is still being compacted, so we wait.
@@ -1433,14 +1445,14 @@ namespace leveldb {
                 background_work_finished_signal_.Wait();
                 // 这里会等待 DoCompactionWork() 函数中的 background_work_finished_signal_.SingalAll()
             }
-            // 0 层文件数量太多（达到12个）
+                // 0 层文件数量太多（达到12个）
             else if (versions_->NumLevelFiles(0) >= config::kL0_StopWritesTrigger) {
                 // There are too many level-0 files.
                 Log(options_.info_log, "Too many L0 files; waiting...\n");
                 background_work_finished_signal_.Wait();
             }
-            // 上面第一次阻塞会等待调用 CompactMemTable(), 即把当前 logfile_ 记录到 VersionEdit
-            // 同时会释放 imm_, 所以这里 imm_ 一定为空,
+                // 上面第一次阻塞会等待调用 CompactMemTable(), 即把当前 logfile_ 记录到 VersionEdit
+                // 同时会释放 imm_, 所以这里 imm_ 一定为空,
             else {
                 // 新建一个新 log_file, 直接删除当前 log_file，然后修改当前 log 相关指针
                 // imm_ = mem_

@@ -347,6 +347,7 @@ namespace leveldb {
                         const LookupKey &k,
                         std::string *value,
                         GetStats *stats) {
+//        std::cout << "Version::Get. key=" << k.ToString() << std::endl;
         Slice ikey = k.internal_key();
         Slice user_key = k.user_key();
         const Comparator *ucmp = vset_->icmp_.user_comparator();

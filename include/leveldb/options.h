@@ -6,6 +6,7 @@
 #define STORAGE_LEVELDB_INCLUDE_OPTIONS_H_
 
 #include <stddef.h>
+#include <iostream>
 #include "leveldb/export.h"
 
 namespace leveldb {

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <format.h>
+
 #include "leveldb/db.h"
 #include "leveldb/options.h"
 #include "leveldb/env.h"
@@ -23,21 +24,37 @@
 int main() {
     leveldb::DB *db;
     leveldb::Options options;
-    options.create_if_missing = true;
-    options.comparator = leveldb::NumberComparator();
-    std::string dbname_ = "/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/sst";
-    leveldb::Status status = leveldb::DB::Open(options, dbname_, &db);
+    std::string db_name = DB_NAMW_WIN;
+    leveldb::Status status = MyOpen(db_name, &db, options);
+    assert(status.ok());
+    std::cout << "filter name : " << options.filter_policy->Name() << std::endl;
 
-    // 打开文件号为 4 的 table
-    leveldb::FileMetaData *fileMetaData = GetTargetFile(6, db);
-    std::cout<< fileMetaData->number<<std::endl;
-    std::string fname = leveldb::TableFileName(dbname_, fileMetaData->number);
-    leveldb::RandomAccessFile *read_file = nullptr;
+// 打开第一个 table
     leveldb::Table *table = nullptr;
-    options.env->NewRandomAccessFile(fname, &read_file);
-    status = leveldb::Table::Open(options, read_file, fileMetaData->file_size, &table);
+    OpenFirstTable(db_name, db, options, &table);
 
-    std::cout << table->KeyInTable(leveldb::ReadOptions(), "97882");
+// 获取第一个 table 的第一个 key,value
+    leveldb::Iterator *table_iter = table->NewIterator(leveldb::ReadOptions());
+    table_iter->SeekToFirst();
+    std::string user_key;
+    std::string user_value;
+    if (table_iter->Valid()) {
+        leveldb::ParsedInternalKey ikey;
+        leveldb::ParseInternalKey(table_iter->key(), &ikey);
+        user_key = ikey.user_key.ToString();
+        user_value = table_iter->value().ToString();
+        std::cout << std::endl << "first table's first entry:" << std::endl << "user_key:" << user_key << ", user_value:" << user_value << std::endl << std::endl;
+    }// user_key:0, user_value:100000
+
+//    应该找不到 key = 0 时对应的值
+//    std::string get_value;
+//    db->Get(leveldb::ReadOptions(), user_key, &get_value);
+//    std::cout << "get_value:" << get_value << ", get_value size:" << get_value.size() << std::endl << std::endl;
+
+    uint64_t seq = 2;
+    std::string tmp_value = user_value;
+    leveldb::PutFixed64(&tmp_value, seq);
+    std::cout << table->ValueInTable(leveldb::ReadOptions(), tmp_value);
 
     delete db;
     return 0;

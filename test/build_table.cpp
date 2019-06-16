@@ -18,7 +18,7 @@ int main() {
     leveldb::Options options;
     options.create_if_missing = true;
     options.comparator = leveldb::NumberComparator();
-    std::string dbname_ = "/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/sst";
+    std::string dbname_ = "C:\\Users\\rrzhang\\myspace\\WorkSpace\\Jetbrains\\JetbrainsCLionProjects\\test_leveldb\\sst";
     leveldb::Status status = leveldb::DB::Open(options, dbname_, &db);
 
     for(int i = 0; i<100000; i++){

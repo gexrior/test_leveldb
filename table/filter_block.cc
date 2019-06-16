@@ -6,6 +6,7 @@
 
 #include "leveldb/filter_policy.h"
 #include "util/coding.h"
+#include <iostream>
 
 namespace leveldb {
 
@@ -94,6 +95,7 @@ namespace leveldb {
     }
 
     bool FilterBlockReader::KeyMayMatch(uint64_t block_offset, const Slice &key) {
+//        std::cout << "FilterBlockReader::KeyMayMatch. key=" << key.ToString() << ", value size:=" << key.size()<< std::endl;
         uint64_t index = block_offset >> base_lg_;
         if (index < num_) {
             uint32_t start = DecodeFixed32(offset_ + index * 4);

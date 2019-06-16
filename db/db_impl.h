@@ -32,6 +32,7 @@ namespace leveldb {
 
     class DBImpl : public DB {
     public:
+//        virtual VersionSet* GetVersions();
         virtual Version* GetCurrentVersion();
 
         DBImpl(const Options &options, const std::string &dbname);

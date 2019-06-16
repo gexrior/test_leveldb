@@ -35,15 +35,12 @@ int main() {
         leveldb::Status s = db->Put(leveldb::WriteOptions(), key, value);
     }
 
-
     delete db;
     status = leveldb::DB::Open(options, dbname_, &db);
     leveldb::Version *current = db->GetCurrentVersion();
     for(int i = 0; i< 7;i++){
         fun(current, i);
     }
-
-
 
     return 0;
 }

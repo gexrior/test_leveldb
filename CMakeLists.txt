@@ -257,7 +257,7 @@ add_executable(test_read_small_largerest
         test/test_read_small_largerest.cpp
         )
 
-add_executable(read_table
+add_executable(test_scan_table
         db/builder.cc
         db/builder.h
         db/c.cc
@@ -352,7 +352,7 @@ add_executable(read_table
         util/status.cc
         util/testutil.h
 
-        test/read_table.cpp
+        test/test_scan_table.cpp
         )
 add_executable(test_build_table
         db/builder.cc
@@ -651,7 +651,7 @@ add_executable(test_filter
 find_package(Threads REQUIRED)
 target_link_libraries(db_bench Threads::Threads)
 target_link_libraries(test_read_small_largerest Threads::Threads)
-target_link_libraries(read_table Threads::Threads)
+target_link_libraries(test_scan_table Threads::Threads)
 target_link_libraries(test_build_table Threads::Threads)
 target_link_libraries(build_table Threads::Threads)
 target_link_libraries(test_filter Threads::Threads)

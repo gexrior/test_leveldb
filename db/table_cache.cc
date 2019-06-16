@@ -116,6 +116,7 @@ namespace leveldb {
                            const Slice &k,
                            void *arg,
                            void (*saver)(void *, const Slice &, const Slice &)) {
+//        std::cout << "TableCache::Get. key=" << k.ToString() << std::endl;
         Cache::Handle *handle = nullptr;
         Status s = FindTable(file_number, file_size, &handle);
         if (s.ok()) {

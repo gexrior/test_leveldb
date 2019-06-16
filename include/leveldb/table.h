@@ -60,7 +60,7 @@ namespace leveldb {
         uint64_t ApproximateOffsetOf(const Slice &key) const;
 //
         Iterator* GetIndexIterator() const ;
-        bool KeyInTable(const ReadOptions &options, const Slice &user_value);
+        bool ValueInTable(const ReadOptions &options, const Slice &user_value);
     private:
         struct Rep;
         Rep *rep_;

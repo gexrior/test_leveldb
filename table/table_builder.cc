@@ -124,15 +124,17 @@ namespace leveldb {
         }
 
         if (r->filter_block != nullptr) {
-            r->filter_block->AddKey(key);   // 向布隆过滤器添加值
-//            r->filter_block->AddKey(value);   // 向布隆过滤器添加值
+//            r->filter_block->AddKey(key);   // 向布隆过滤器添加值
+
+            uint64_t seq = 1;
+            std::string tmp_value = value.ToString();
+            PutFixed64(&tmp_value, seq);
+            r->filter_block->AddKey(Slice(tmp_value));   // 向布隆过滤器添加值
         }
 
         r->last_key.assign(key.data(), key.size());     // 更新 last_key
         r->num_entries++;
         r->data_block.Add(key, value);
-
-
 
         // 当前 data_block 大小达到 options 定义的 4KB，就刷一次盘
         const size_t estimated_block_size = r->data_block.CurrentSizeEstimate();

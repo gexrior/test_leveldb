@@ -231,6 +231,7 @@ namespace leveldb {
     Status Table::InternalGet(const ReadOptions &options, const Slice &k,
                               void *arg,
                               void (*saver)(void *, const Slice &, const Slice &)) {
+        std::cout << "Table::InternalGet. key=" << k.ToString() << std::endl;
         Status s;
         Iterator *iiter = rep_->index_block->NewIterator(rep_->options.comparator);
         iiter->Seek(k);
@@ -243,6 +244,7 @@ namespace leveldb {
                 !filter->KeyMayMatch(handle.offset(), k)) {
                 // Not found
             } else {
+                std::cout << "InternalGet hit the filter!" << std::endl;
                 Iterator *block_iter = BlockReader(this, options, iiter->value());
                 block_iter->Seek(k);
                 if (block_iter->Valid()) {
@@ -259,11 +261,11 @@ namespace leveldb {
         return s;
     }
 
-    bool Table::KeyInTable(const ReadOptions &options, const Slice &user_value) {
+    bool Table::ValueInTable(const ReadOptions &options, const Slice &user_value) {
         Iterator *iiter = rep_->index_block->NewIterator(rep_->options.comparator);
         iiter->SeekToFirst();
         bool flag = false;
-        while(iiter->Valid()){
+        while (iiter->Valid()) {
             Slice handle_value = iiter->value();
             FilterBlockReader *filter = rep_->filter;
             BlockHandle handle;
@@ -271,7 +273,8 @@ namespace leveldb {
                 handle.DecodeFrom(&handle_value).ok() &&
                 !filter->KeyMayMatch(handle.offset(), user_value)) {
             } else {
-                flag ==  true;
+                std::cout << "KeyInTable hit the filter!" << std::endl;
+                flag = true;
                 return flag;
             }
             iiter->Next();
@@ -307,7 +310,7 @@ namespace leveldb {
         return result;
     }
 
-    Iterator* Table::GetIndexIterator() const {
+    Iterator *Table::GetIndexIterator() const {
         return rep_->index_block->NewIterator(rep_->options.comparator);
     };
 
