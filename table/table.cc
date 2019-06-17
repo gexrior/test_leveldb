@@ -273,7 +273,7 @@ namespace leveldb {
                 handle.DecodeFrom(&handle_value).ok() &&
                 !filter->KeyMayMatch(handle.offset(), user_value)) {
             } else {
-                std::cout << "KeyInTable hit the filter!" << std::endl;
+//                std::cout << "KeyInTable hit the filter!" << std::endl;
                 flag = true;
                 return flag;
             }

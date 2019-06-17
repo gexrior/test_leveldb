@@ -2,12 +2,16 @@
 // Created by rrzhang on 19-6-15.
 //
 
-
-
 #include <cassert>
+#include <dirent.h>
+#include <format.h>
 #include <iostream>
 #include <string>
-#include <format.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "leveldb/db.h"
 #include "leveldb/options.h"
 #include "leveldb/env.h"
@@ -24,6 +28,12 @@
 #define DB_NAMW_WIN "C:\\Users\\rrzhang\\myspace\\WorkSpace\\Jetbrains\\JetbrainsCLionProjects\\test_leveldb\\sst"
 #define DB_NAME_POSIX "/home/rrzhang/WorkSpace/Jetbrains/CLionProjects/test_leveldb/sst"
 
+// TODO: 删除 db 文件夹，暂时有点问题
+//int DeleteDB(const std::string &db_name){
+//    rmdir(db_name.data());
+//}
+
+// 输出所有层所有文件的文件号
 void PrineAllLevelFile(leveldb::DB *db) {
 //    std::cout << "In PrineAllLevelFile." << std::endl;
     leveldb::Version *current = db->GetCurrentVersion();
@@ -39,11 +49,13 @@ void PrineAllLevelFile(leveldb::DB *db) {
     }
 }
 
+// 返回第 0 层，第 0 个文件的号
 uint64_t GetFirstFileNUmber(leveldb::DB *db) {
     leveldb::Version *current = db->GetCurrentVersion();
     return current->GetFiles(0)[0]->number;
 }
 
+// 给定文件号，返回 FileMetaData*
 leveldb::FileMetaData *GetTargetFile(uint64_t file_number, leveldb::DB *db) {
 //    std::cout << "In GetTargetFile. " << std::endl;
     leveldb::Version *current = db->GetCurrentVersion();
@@ -57,6 +69,7 @@ leveldb::FileMetaData *GetTargetFile(uint64_t file_number, leveldb::DB *db) {
     }
 }
 
+// 打开第 0 层，第 0 个文件的table
 leveldb::Status
 OpenFirstTable(std::string db_name, leveldb::DB *db, const leveldb::Options &options, leveldb::Table **table) {
     leveldb::Status status;
@@ -68,23 +81,23 @@ OpenFirstTable(std::string db_name, leveldb::DB *db, const leveldb::Options &opt
     return status;
 }
 
+// 往db中写入 key(0-100000), value(100000-199999)
 leveldb::Status BuildTable_0_100000(leveldb::DB *db) {
 
     leveldb::Status status;
     for (int i = 0; i < 100000; i++) {
         status = db->Put(leveldb::WriteOptions(), std::to_string(i), std::to_string(i + 100000));
-//        status = db->Put(leveldb::WriteOptions(), std::to_string(i), std::to_string(i));
         assert(status.ok());
     }
     std::cout << "Put entries 0-100000 successful." << std::endl;
     return status;
 }
 
+// 打开数据库
 leveldb::Status MyOpen(std::string db_name, leveldb::DB **db, leveldb::Options &options) {
     bool new_db = false;
 
     options.comparator = leveldb::NumberComparator();
-    options.filter_policy = leveldb::NewBloomFilterPolicy(10);
     leveldb::Status status = leveldb::DB::Open(options, db_name, db);
     if (!status.ok()) {
         new_db = true;
@@ -107,6 +120,7 @@ leveldb::Status MyOpen(std::string db_name, leveldb::DB **db, leveldb::Options &
     return status;
 }
 
+// 扫描某个 table 表
 void ScanTable(leveldb::Iterator *table_iter) {
     table_iter->SeekToFirst();
     while (table_iter->Valid()) {
@@ -116,4 +130,63 @@ void ScanTable(leveldb::Iterator *table_iter) {
         std::cout << "   value:" << table_iter->value().ToString() << std::endl;
         table_iter->Next();
     }
+}
+
+// 返回某个 value 是否在 某个table 中
+bool ValueInTable( leveldb::Table* table, std::string value) {
+    uint64_t seq = 2;
+    std::string tmp_value = value;
+    leveldb::PutFixed64(&tmp_value, seq);
+//    std::cout << table->ValueInTable(leveldb::ReadOptions(), tmp_value);
+}
+
+// 返回某个 table 的第一个entry
+void GetFirstEntry(leveldb::Table* table, std::string* key,std::string* value){
+    leveldb::Iterator *table_iter = table->NewIterator(leveldb::ReadOptions());
+    table_iter->SeekToFirst();
+    if (table_iter->Valid()) {
+        leveldb::ParsedInternalKey ikey;
+        leveldb::ParseInternalKey(table_iter->key(), &ikey);
+        *key = ikey.user_key.ToString();
+        *value = table_iter->value().ToString();
+//        std::cout << std::endl << "first table's first entry:" << std::endl << "user_key:" << user_key << ", user_value:" << user_value << std::endl << std::endl;
+    }
+}
+
+void Getfilepath(const char *path, const char *filename,  char *filepath)
+{
+    strcpy(filepath, path);
+    if(filepath[strlen(path) - 1] != '/')
+        strcat(filepath, "/");
+    strcat(filepath, filename);
+//    printf("path is = %s\n",filepath);
+}
+
+bool DeleteFile(const char* path)
+{
+    DIR *dir;
+    struct dirent *dirinfo;
+    struct stat statbuf;
+    char filepath[256] = {0};
+    lstat(path, &statbuf);
+
+    if (S_ISREG(statbuf.st_mode))//判断是否是常规文件
+    {
+        remove(path);
+    }
+    else if (S_ISDIR(statbuf.st_mode))//判断是否是目录
+    {
+        if ((dir = opendir(path)) == NULL)
+            return 1;
+        while ((dirinfo = readdir(dir)) != NULL)
+        {
+            Getfilepath(path, dirinfo->d_name, filepath);
+            if (strcmp(dirinfo->d_name, ".") == 0 || strcmp(dirinfo->d_name, "..") == 0)//判断是否是特殊目录
+                continue;
+            DeleteFile(filepath);
+            rmdir(filepath);
+        }
+        closedir(dir);
+    }
+    return 0;
 }
