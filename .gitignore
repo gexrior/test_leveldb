@@ -16,3 +16,4 @@ leveldbConfigVersion.cmake
 Makefile
 CMakeCache.txt
 sst/
+.idea/
